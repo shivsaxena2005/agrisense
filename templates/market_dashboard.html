@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriVision - Market Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+        }
+
+        .logo::before {
+            content: "💰";
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #2d6a4f;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .market-summary {
+            display: flex;
+            justify-content: space-around;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .summary-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d6a4f;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .trend-badge {
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .market-table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+        }
+
+        .market-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .market-table th, .market-table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .market-table th {
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .market-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .price-cell {
+            font-weight: bold;
+            color: #2d6a4f;
+        }
+
+        .return-btn {
+            background: transparent;
+            border: 2px solid #2d6a4f;
+            color: #2d6a4f;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: block;
+            width: fit-content;
+            margin: 2rem auto 0;
+        }
+
+        .return-btn:hover {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .market-summary {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AgriSense</div>
+        <ul class="nav-links">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/disease">Disease</a></li>
+            <li><a href="/iot">IoT & Growth</a></li>
+            <li><a href="/market" class="active">Market & Partnerships</a></li>
+        </ul>
+        <div class="user-section">
+            <div class="user-avatar">A</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Market Dashboard</h1>
+
+        <div class="market-summary">
+            <div class="summary-card">
+                <div class="summary-card-title">Wheat Price Trend</div>
+                <div class="summary-value">₹{{ market_data[0].price }}</div>
+                <span class="trend-badge {{ wheat_trend.direction }}">
+                    {{ wheat_trend.change }} {{ '▲' if wheat_trend.direction == 'up' else '▼' }} (30 days)
+                </span>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-title">Total Daily Arrivals</div>
+                <div class="summary-value">{{ market_data | map(attribute='arrivals') | sum }} bags</div>
+
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-title">Top Performer</div>
+                <div class="summary-value">{{ market_data[0].name }}</div>
+            </div>
+        </div>
+
+        <div class="market-table-container">
+            <h2 class="section-title">Commodity Prices & Arrivals</h2>
+            <table class="market-table">
+                <thead>
+                    <tr>
+                        <th>Commodity</th>
+                        <th>Market</th>
+                        <th>Price (per quintal)</th>
+                        <th>Arrivals (bags)</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in market_data %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.market }}</td>
+                            <td class="price-cell">₹{{ item.price }}</td>
+                            <td>{{ item.arrivals }}</td>
+                            <td>{{ item.time }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/" class="return-btn">Go Back to Dashboard</a>
+    </div>
+</body>
+</html>

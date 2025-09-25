@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSense - Smart Agriculture Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+        }
+
+        .logo::before {
+            content: "🌱";
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #2d6a4f;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .upload-btn {
+            background: #2d6a4f;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.3s;
+        }
+
+        .upload-btn:hover {
+            background: #1b4332;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .disease-card {
+            grid-column: span 2;
+        }
+
+        .diagnosis-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .diagnosis-label {
+            color: #666;
+        }
+
+        .severity {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: #666;
+        }
+
+        .iot-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .iot-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: #d4edda;
+        }
+
+        .iot-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .iot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .predictions-section {
+            margin-top: 2rem;
+        }
+
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .prediction-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .prediction-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .planting-icon { background: #2d6a4f; }
+        .harvesting-icon { background: #17a2b8; }
+        .yield-icon { background: #28a745; }
+
+        .prediction-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .prediction-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .flash-messages {
+            margin-bottom: 1rem;
+        }
+
+        .flash-message {
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+
+        /* Disease Analysis Styles */
+        .disease-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .scientific-name {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 0.3rem;
+        }
+
+        .plant-info {
+            font-size: 0.9rem;
+            color: #2d6a4f;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            background: #d4edda;
+            color: #155724;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .severity-high {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .severity-medium {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .severity-low {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .treatment-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .treatment-info h4 {
+            color: #2d6a4f;
+            margin-bottom: 0.5rem;
+        }
+
+        .treatment-info p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #2d6a4f;
+            background: transparent;
+            color: #2d6a4f;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        /* Detailed Disease Analysis Styles */
+        .detailed-disease-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .detailed-analysis {
+            width: 100%;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .analysis-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #2d6a4f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .analysis-section h3 {
+            color: #2d6a4f;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .info-value.scientific {
+            font-style: italic;
+            color: #2d6a4f;
+        }
+
+        .confidence-4, .confidence-5 {
+            color: #28a745;
+        }
+
+        .confidence-3 {
+            color: #ffc107;
+        }
+
+        .confidence-1, .confidence-2 {
+            color: #dc3545;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .recommendation-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #17a2b8;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .recommendation-section h3 {
+            color: #17a2b8;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .recommendation-content {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .alternative-diseases {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .alternative-diseases h3 {
+            color: #856404;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .disease-alternatives {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .alternative-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alt-disease-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .alt-confidence {
+            background: #e9ecef;
+            color: #666;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+
+        .no-analysis {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .no-analysis-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .no-analysis h3 {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-analysis p {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .disease-card {
+                grid-column: span 1;
+            }
+            
+            .predictions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .iot-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AgriSense</div>
+        <ul class="nav-links">
+            <li><a href="/" class="active">Dashboard</a></li>
+            <li><a href="/disease">Disease</a></li>
+            <li><a href="/iot">IoT & Growth</a></li>
+            <li><a href="/market">Market & Partnerships</a></li>
+        </ul>
+        <div class="user-avatar">A</div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Smart Agriculture Dashboard</h1>
+            <form action="/upload" method="post" enctype="multipart/form-data" style="display: inline;">
+                <input type="file" name="file" id="fileInput" class="file-input" accept="image/*" onchange="this.form.submit()">
+                <label for="fileInput" class="upload-btn">
+                    📤 Upload Crop Image
+                </label>
+            </form>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="main-grid">
+            <div class="card disease-card">
+                <h2 class="card-title">Disease Diagnosis</h2>
+                <div class="diagnosis-info">
+                    {% if diagnosis_result %}
+                        <div class="disease-header">
+                            <span class="diagnosis-label">Disease: <strong>{{ diagnosis_result.disease }}</strong></span>
+                            <span class="severity severity-{{ diagnosis_result.severity.lower() }}">{{ diagnosis_result.severity }}</span>
+                        </div>
+                        {% if diagnosis_result.scientific_name %}
+                            <div class="scientific-name">Scientific: {{ diagnosis_result.scientific_name }}</div>
+                        {% endif %}
+                        {% if diagnosis_result.plant_name %}
+                            <div class="plant-info">Plant: {{ diagnosis_result.plant_name }}
+                                {% if diagnosis_result.plant_scientific_name %}
+                                    ({{ diagnosis_result.plant_scientific_name }})
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <div class="confidence-badge">Confidence: {{ diagnosis_result.confidence }}</div>
+                    {% else %}
+                        <span style="color: #666;">Upload image for AI diagnosis</span>
+                    {% endif %}
+                </div>
+                
+                <div class="image-container">
+                    {% if uploaded_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + uploaded_image) }}" alt="Uploaded crop image">
+                    {% else %}
+                        <div class="upload-placeholder">
+                            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🌿</div>
+                            <div>Click "Upload Crop Image" to analyze your crop</div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if diagnosis_result %}
+                    <div class="treatment-info">
+                        <h4>💊 Treatment</h4>
+                        <p>{{ diagnosis_result.treatment }}</p>
+                    </div>
+                    <div class="treatment-info" style="margin-top: 0.5rem;">
+                        <h4>🛡️ Prevention</h4>
+                        <p>{{ diagnosis_result.prevention }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="card detailed-disease-card">
+                <h2 class="card-title">📊 Detailed Disease Analysis</h2>
+                {% if diagnosis_result %}
+                    <div class="detailed-analysis">
+                        <div class="analysis-grid">
+                            <div class="analysis-section">
+                                <h3>🔬 Disease Information</h3>
+                                <div class="info-item">
+                                    <span class="info-label">Disease Name:</span>
+                                    <span class="info-value">{{ diagnosis_result.disease }}</span>
+                                </div>
+                                {% if diagnosis_result.scientific_name %}
+                                <div class="info-item">
+                                    <span class="info-label">Scientific Name:</span>
+                                    <span class="info-value scientific">{{ diagnosis_result.scientific_name }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-item">
+                                    <span class="info-label">Confidence Level:</span>
+                                    <span class="info-value confidence-{{ diagnosis_result.confidence.replace('%', '')|int // 20 }}">{{ diagnosis_result.confidence }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Severity:</span>
+                                    <span class="info-value severity-{{ diagnosis_result.severity.lower() }}">{{ diagnosis_result.severity }}</span>
+                                </div>
+                            </div>
+
+                            <div class="analysis-section">
+                                <h3>🌿 Plant Information</h3>
+                                {% if diagnosis_result.plant_name %}
+                                <div class="info-item">
+                                    <span class="info-label">Plant Name:</span>
+                                    <span class="info-value">{{ diagnosis_result.plant_name }}</span>
+                                </div>
+                                {% endif %}
+                                {% if diagnosis_result.plant_scientific_name %}
+                                <div class="info-item">
+                                    <span class="info-label">Scientific Name:</span>
+                                    <span class="info-value scientific">{{ diagnosis_result.plant_scientific_name }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-item">
+                                    <span class="info-label">Detection Method:</span>
+                                    <span class="info-value">AI-Powered Image Analysis</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Analysis Date:</span>
+                                    <span class="info-value" id="analysis-date">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="recommendations-grid">
+                            <div class="recommendation-section">
+                                <h3>💊 Treatment Recommendations</h3>
+                                <div class="recommendation-content">
+                                    <p>{{ diagnosis_result.treatment }}</p>
+                                </div>
+                            </div>
+                            <div class="recommendation-section">
+                                <h3>🛡️ Prevention Strategies</h3>
+                                <div class="recommendation-content">
+                                    <p>{{ diagnosis_result.prevention }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if diagnosis_result.all_diseases and diagnosis_result.all_diseases|length > 1 %}
+                        <div class="alternative-diseases">
+                            <h3>🔍 Alternative Diagnoses</h3>
+                            <div class="disease-alternatives">
+                                {% for disease in diagnosis_result.all_diseases[1:4] %}
+                                <div class="alternative-item">
+                                    <span class="alt-disease-name">{{ disease.name }}</span>
+                                    <span class="alt-confidence">{{ (disease.probability * 100)|round(1) }}%</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                {% else %}
+                    <div class="no-analysis">
+                        <div class="no-analysis-icon">🔬</div>
+                        <h3>No Analysis Available</h3>
+                        <p>Upload a crop image to get detailed disease analysis and recommendations.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="iot-grid">
+            <div style="background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 12px; padding: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="color: #dc3545; font-size: 1.2rem;">⚠️</div>
+                    <div>
+                        <h4 style="color: #721c24; margin-bottom: 0.25rem;">Weather Alert</h4>
+                        <p style="color: #721c24; font-size: 0.9rem;">{{ iot_data.weather_alert.warning }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="predictions-section">
+            <h2 class="card-title">Growth Predictions</h2>
+            <div class="predictions-grid">
+                <div class="prediction-card">
+                    <div class="prediction-icon planting-icon">📅</div>
+                    <div class="prediction-title">Planting Window</div>
+                    <div class="prediction-details">{{ predictions.planting.window }}</div>
+                </div>
+                
+                <div class="prediction-card">
+                    <div class="prediction-icon harvesting-icon">⏰</div>
+                    <div class="prediction-title">Harvest Time</div>
+                    <div class="prediction-details">{{ predictions.harvesting.window }}</div>
+                </div>
+                
+                <div class="prediction-card">
+                    <div class="prediction-icon yield-icon">📈</div>
+                    <div class="prediction-title">Expected Yield</div>
+                    <div class="prediction-details">{{ predictions.yield.expected }} kg/acre</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ predictions.yield.progress }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="/iot" class="nav-btn">📊 Detailed IoT & Growth Analysis</a>
+            <a href="/market" class="nav-btn">📈 Market Prices & Partnerships</a>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date for analysis
+            const analysisDateElement = document.getElementById('analysis-date');
+            if (analysisDateElement) {
+                const now = new Date();
+                const formattedDate = now.toISOString().slice(0, 16).replace('T', ' ');
+                analysisDateElement.textContent = formattedDate;
+            }
+            
+            // Auto-refresh data every 30 seconds
+            setInterval(() => {
+                console.log('Auto-refreshing IoT data...');
+                // In production, you'd use AJAX to update data
+            }, 30000);
+        });
+
+    </script>
+</body>
+</html>
