@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Model</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            margin-top: 80px;
+            height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            background-color: #ffffff;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-welcome {
+            background: linear-gradient(135deg, #2d6a4f, #52b788);
+            color: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .welcome-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-text {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .welcome-text h2 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .welcome-actions {
+            margin-left: 2rem;
+        }
+
+        .clear-chat-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .clear-chat-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            -webkit-overflow-scrolling: touch;
+            background-color: #f8f9fa;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 1rem 1.25rem;
+            border-radius: 1.5rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .message.user {
+            background-color: #d4edda;
+            color: #2d6a4f;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .message.ai {
+            background-color: #f1f3f4;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        /* Better formatting for AI responses */
+        .message.ai h1, .message.ai h2, .message.ai h3 {
+            margin: 0.5rem 0;
+            font-weight: 600;
+            color: #2d6a4f;
+        }
+
+        .message.ai ul, .message.ai ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .message.ai li {
+            margin: 0.25rem 0;
+        }
+
+        .message.ai table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .message.ai th, .message.ai td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .message.ai th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .message.ai strong {
+            color: #2d6a4f;
+            font-weight: 600;
+        }
+        
+        .chat-input-area {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background-color: #ffffff;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 2rem;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        .chat-input:focus {
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 0.2rem rgba(45, 106, 79, 0.25);
+        }
+
+        .send-btn, .voice-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 80px;
+            pointer-events: auto;
+            z-index: 1;
+        }
+        
+        .send-btn {
+            background-color: #2d6a4f;
+            box-shadow: 0 2px 4px rgba(45, 106, 79, 0.3);
+        }
+
+        .send-btn:hover {
+            background-color: #1b4332;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(45, 106, 79, 0.4);
+        }
+        
+        .voice-btn {
+            background-color: #17a2b8;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+        }
+        
+        .voice-btn:hover {
+            background-color: #117a8b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.4);
+        }
+
+        .voice-btn.listening {
+            background-color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-btn.processing {
+            background-color: #ffc107;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .voice-status {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .voice-status.show {
+            opacity: 1;
+        }
+
+        .mic-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .voice-btn.listening .mic-icon {
+            transform: scale(1.2);
+        }
+
+        /* Loading indicator for new messages */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading-indicator.show {
+            display: block;
+        }
+
+        .loading-dots {
+            display: inline-block;
+            animation: loadingDots 1.5s infinite;
+        }
+
+        @keyframes loadingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-top: 70px;
+                height: calc(100vh - 70px);
+            }
+
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+
+            .chat-welcome {
+                padding: 0.75rem 1rem;
+            }
+
+            .welcome-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .welcome-text {
+                text-align: center;
+                width: 100%;
+            }
+
+            .welcome-text h2 {
+                font-size: 1.1rem;
+            }
+
+            .welcome-text p {
+                font-size: 0.8rem;
+            }
+
+            .welcome-actions {
+                margin-left: 0;
+                align-self: center;
+            }
+
+            .clear-chat-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .chat-messages {
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .message {
+                max-width: 85%;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .chat-input-area {
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+
+            .chat-input {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .send-btn, .voice-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                min-width: 60px;
+            }
+        }
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #2d6a4f;
+        }
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #2d6a4f;
+            background: transparent;
+            color: #2d6a4f;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #495057;
+            cursor: pointer;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AgriSense</div>
+        <ul class="nav-links">
+            <li><a href="/?lang={{ language }}">{{ lang.nav_dashboard }}</a></li>
+            <li><a href="/disease?lang={{ language }}">{{ lang.nav_disease }}</a></li>
+            <li><a href="/iot?lang={{ language }}">{{ lang.nav_iot }}</a></li>
+            <li><a href="/market?lang={{ language }}">{{ lang.nav_market }}</a></li>
+            <li><a href="/chat?lang={{ language }}" class="active">{{ lang.nav_chat }}</a></li>
+            <select id="languageSelect" onchange="changeLanguage()" style="padding: 0.5rem; margin-left: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+                <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+            </select>
+        </ul>
+        <div class="user-avatar">A</div>
+    </nav>
+    <div class="main-content">
+        <div class="chat-container">
+        <div class="chat-welcome">
+            <div class="welcome-content">
+                <div class="welcome-text">
+                    <h2>🤖 AgriSense AI Assistant</h2>
+                    <p>Ask me anything about farming, crop prices, disease detection, or agricultural advice!</p>
+                </div>
+                <div class="welcome-actions">
+                    <form action="/clear_history" method="post" style="margin: 0;">
+                        <button type="submit" class="clear-chat-btn">Clear Chat</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            {% if history %}
+                {% for message in history %}
+                    {% if message.User %}
+                        <div class="message user">{{ message.User }}</div>
+                    {% endif %}
+                    {% if message.AI %}
+                        <div class="message ai">{{ message.AI }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="message ai">Hello! I'm here to help you with your farming queries. How can I assist you?</div>
+            {% endif %}
+            <div class="loading-indicator" id="loading-indicator">
+                <span>AI is thinking</span><span class="loading-dots"></span>
+            </div>
+            <div id="scroll-anchor"></div>
+        </div>
+        <div class="chat-input-area">
+            <form action="/chat" method="post" id="chat-form" style="display: flex; flex-grow: 1; gap: 0.5rem;">
+                <input type="text" name="message" id="chat-input" class="chat-input" placeholder="Type your question..." required>
+                <button type="submit" id="send-btn" class="send-btn">Send</button>
+            </form>
+            <div style="position: relative; margin: 0;">
+                <div class="voice-status" id="voice-status">Click to start recording</div>
+                <form action="/voice_input" method="post" style="margin: 0;">
+                    <button id="voice-btn" class="voice-btn" type="button" onclick="toggleVoiceInput()">
+                        <span class="mic-icon">🎙️</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let recognition = null;
+
+        function changeLanguage() {
+            const select = document.getElementById('languageSelect');
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('lang', select.value);
+            window.location.href = currentUrl.toString();
+        }
+
+        function showVoiceStatus(message, duration = 3000) {
+            const status = document.getElementById('voice-status');
+            status.textContent = message;
+            status.classList.add('show');
+            
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, duration);
+        }
+
+        function setVoiceButtonState(state) {
+            const btn = document.getElementById('voice-btn');
+            const icon = btn.querySelector('.mic-icon');
+            
+            // Remove all state classes
+            btn.classList.remove('listening', 'processing');
+            
+            switch(state) {
+                case 'idle':
+                    icon.textContent = '🎙️';
+                    break;
+                case 'listening':
+                    btn.classList.add('listening');
+                    icon.textContent = '🔴';
+                    break;
+                case 'processing':
+                    btn.classList.add('processing');
+                    icon.textContent = '⏳';
+                    break;
+            }
+        }
+
+        function toggleVoiceInput() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showVoiceStatus('Voice recognition not supported in this browser', 5000);
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                isRecording = true;
+                setVoiceButtonState('listening');
+                showVoiceStatus('Listening... Speak now!', 0);
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                setVoiceButtonState('processing');
+                showVoiceStatus('Processing your speech...', 0);
+                
+                // Submit the form with the transcribed text
+                submitVoiceInput(transcript);
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                isRecording = false;
+                setVoiceButtonState('idle');
+                
+                let errorMessage = 'Voice recognition error. Please try again.';
+                if (event.error === 'no-speech') {
+                    errorMessage = 'No speech detected. Please try again.';
+                } else if (event.error === 'audio-capture') {
+                    errorMessage = 'Microphone not found. Please check your microphone.';
+                } else if (event.error === 'not-allowed') {
+                    errorMessage = 'Microphone access denied. Please allow microphone access.';
+                }
+                
+                showVoiceStatus(errorMessage, 5000);
+            };
+
+            recognition.onend = function() {
+                if (isRecording) {
+                    isRecording = false;
+                    setVoiceButtonState('idle');
+                    showVoiceStatus('Recording stopped', 2000);
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Error starting speech recognition:', error);
+                showVoiceStatus('Error starting voice recognition', 3000);
+            }
+        }
+
+        function stopRecording() {
+            if (recognition) {
+                recognition.stop();
+            }
+            isRecording = false;
+            setVoiceButtonState('idle');
+            showVoiceStatus('Recording stopped', 2000);
+        }
+
+        function submitVoiceInput(transcript) {
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/voice_input';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'transcript';
+            input.value = transcript;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Auto-scroll functionality
+        function scrollToBottom() {
+            const scrollAnchor = document.getElementById('scroll-anchor');
+            if (scrollAnchor) {
+                scrollAnchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+
+        // Initialize voice status and auto-scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            showVoiceStatus('Click microphone to start voice input', 3000);
+            // Auto-scroll to bottom on page load
+            setTimeout(scrollToBottom, 200);
+            
+            // Debug: Check if form exists
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            console.log('Chat form found:', !!chatForm);
+            console.log('Chat input found:', !!chatInput);
+            
+            // Test form submission
+            if (chatForm) {
+                console.log('Form action:', chatForm.action);
+                console.log('Form method:', chatForm.method);
+            }
+            
+            // Add Enter key support for form submission
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    console.log('Enter key pressed');
+                    e.preventDefault();
+                    
+                    // Check if input has content
+                    if (chatInput.value.trim()) {
+                        console.log('Submitting form with Enter key');
+                        chatForm.submit();
+                    } else {
+                        console.log('Empty input, not submitting');
+                    }
+                }
+            });
+        });
+
+        // Auto-scroll when new messages are added
+        function autoScrollToBottom() {
+            setTimeout(scrollToBottom, 300);
+        }
+
+        // Scroll to bottom when page is resized
+        window.addEventListener('resize', function() {
+            setTimeout(scrollToBottom, 100);
+        });
+
+        // Handle form submission with loading indicator
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            console.log('Form submitted!');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const sendBtn = document.getElementById('send-btn');
+            const chatInput = document.getElementById('chat-input');
+            
+            console.log('Input value:', chatInput.value);
+            console.log('Form action:', this.action);
+            console.log('Form method:', this.method);
+            
+            // Check if input is empty
+            if (!chatInput.value.trim()) {
+                e.preventDefault();
+                console.log('Empty input, preventing submission');
+                return;
+            }
+            
+            // Show loading indicator
+            loadingIndicator.classList.add('show');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            chatInput.disabled = true;
+            
+            // Auto-scroll to show loading indicator
+            setTimeout(scrollToBottom, 100);
+            
+            // Allow form to submit normally - don't prevent default
+            console.log('Form submitting...');
+            
+            // Don't reset form immediately - let the server handle it
+            // The form will be reset when the page reloads after redirect
+        });
+
+        // Auto-scroll when page becomes visible (for when user returns to tab)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                setTimeout(scrollToBottom, 100);
+            }
+        });
+    </script>
+</body>
+</html>

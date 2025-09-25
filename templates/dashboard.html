@@ -87,6 +87,24 @@
             margin-bottom: 2rem;
         }
 
+        .analysis-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .analysis-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+        }
+
         .dashboard-title {
             font-size: 2rem;
             font-weight: bold;
@@ -597,10 +615,15 @@
     <nav class="navbar">
         <div class="logo">AgriSense</div>
         <ul class="nav-links">
-            <li><a href="/" class="active">Dashboard</a></li>
-            <li><a href="/disease">Disease</a></li>
-            <li><a href="/iot">IoT & Growth</a></li>
-            <li><a href="/market">Market & Partnerships</a></li>
+            <li><a href="/?lang={{ language }}" class="active">{{ lang.nav_dashboard }}</a></li>
+            <li><a href="/disease?lang={{ language }}">{{ lang.nav_disease }}</a></li>
+            <li><a href="/iot?lang={{ language }}">{{ lang.nav_iot }}</a></li>
+            <li><a href="/market?lang={{ language }}">{{ lang.nav_market }}</a></li>
+            <li><a href="/chat?lang={{ language }}">{{ lang.nav_chat }}</a></li>
+            <select id="languageSelect" onchange="changeLanguage()" style="padding: 0.5rem; margin-left: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+                <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+            </select>
         </ul>
         <div class="user-avatar">A</div>
     </nav>
@@ -608,11 +631,13 @@
     <div class="container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Smart Agriculture Dashboard</h1>
-            <form action="/upload" method="post" enctype="multipart/form-data" style="display: inline;">
+            <form action="/" method="post" enctype="multipart/form-data" style="display: inline;">
                 <input type="file" name="file" id="fileInput" class="file-input" accept="image/*" onchange="this.form.submit()">
                 <label for="fileInput" class="upload-btn">
-                    📤 Upload Crop Image
+                    {{ lang.upload_btn }}
                 </label>
+                <input type="hidden" name="language" value="{% if language == 'hi' %}1{% else %}0{% endif %}">
+                
             </form>
         </div>
 
@@ -626,9 +651,10 @@
             {% endif %}
         {% endwith %}
 
+
         <div class="main-grid">
             <div class="card disease-card">
-                <h2 class="card-title">Disease Diagnosis</h2>
+                <h2 class="card-title">{{ lang.disease_diagnosis }}</h2>
                 <div class="diagnosis-info">
                     {% if diagnosis_result %}
                         <div class="disease-header">
@@ -662,16 +688,15 @@
                     {% endif %}
                 </div>
                 
-                {% if diagnosis_result %}
-                    <div class="treatment-info">
-                        <h4>💊 Treatment</h4>
-                        <p>{{ diagnosis_result.treatment }}</p>
-                    </div>
-                    <div class="treatment-info" style="margin-top: 0.5rem;">
-                        <h4>🛡️ Prevention</h4>
-                        <p>{{ diagnosis_result.prevention }}</p>
-                    </div>
-                {% endif %}
+
+        {% if langchain_result %}
+        <div class="analysis-section">
+            <h2 class="analysis-title">{{ lang.ai_analysis }}</h2>
+            <div class="langchain-result">
+                <pre style="white-space: pre-wrap; font-family: inherit; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border: 1px solid #e9ecef; line-height: 1.6;">{{ langchain_result }}</pre>
+            </div>
+        </div>
+        {% endif %}
             </div>
 
             <div class="card detailed-disease-card">
@@ -726,7 +751,7 @@
                             </div>
                         </div>
 
-                        <div class="recommendations-grid">
+                        <!-- <div class="recommendations-grid">
                             <div class="recommendation-section">
                                 <h3>💊 Treatment Recommendations</h3>
                                 <div class="recommendation-content">
@@ -739,7 +764,7 @@
                                     <p>{{ diagnosis_result.prevention }}</p>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         {% if diagnosis_result.all_diseases and diagnosis_result.all_diseases|length > 1 %}
                         <div class="alternative-diseases">
@@ -771,7 +796,7 @@
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <div style="color: #dc3545; font-size: 1.2rem;">⚠️</div>
                     <div>
-                        <h4 style="color: #721c24; margin-bottom: 0.25rem;">Weather Alert</h4>
+                        <h4 style="color: #721c24; margin-bottom: 0.25rem;">{{ lang.weather_alert }}</h4>
                         <p style="color: #721c24; font-size: 0.9rem;">{{ iot_data.weather_alert.warning }}</p>
                     </div>
                 </div>
@@ -779,24 +804,24 @@
         </div>
 
         <div class="predictions-section">
-            <h2 class="card-title">Growth Predictions</h2>
+            <h2 class="card-title">{{ lang.growth_predictions }}</h2>
             <div class="predictions-grid">
                 <div class="prediction-card">
                     <div class="prediction-icon planting-icon">📅</div>
-                    <div class="prediction-title">Planting Window</div>
+                    <div class="prediction-title">{{ lang.planting_window }}</div>
                     <div class="prediction-details">{{ predictions.planting.window }}</div>
                 </div>
                 
                 <div class="prediction-card">
                     <div class="prediction-icon harvesting-icon">⏰</div>
-                    <div class="prediction-title">Harvest Time</div>
+                    <div class="prediction-title">{{ lang.harvest_time }}</div>
                     <div class="prediction-details">{{ predictions.harvesting.window }}</div>
                 </div>
                 
                 <div class="prediction-card">
                     <div class="prediction-icon yield-icon">📈</div>
-                    <div class="prediction-title">Expected Yield</div>
-                    <div class="prediction-details">{{ predictions.yield.expected }} kg/acre</div>
+                    <div class="prediction-title">{{ lang.expected_yield }}</div>
+                    <div class="prediction-details">{{ predictions.yield.expected }} {{ lang.kg_acre }}</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: {{ predictions.yield.progress }}%"></div>
                     </div>
@@ -811,6 +836,19 @@
     </div>
 
     <script>
+        // Language switching functionality
+        function changeLanguage() {
+            const languageSelect = document.getElementById('languageSelect');
+            const selectedLanguage = languageSelect.value;
+            
+            // Get current URL and update language parameter
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('lang', selectedLanguage);
+            
+            // Redirect to the same page with new language
+            window.location.href = currentUrl.toString();
+        }
+        
         // Add some interactivity
         document.addEventListener('DOMContentLoaded', function() {
             // Set current date for analysis
@@ -831,3 +869,7 @@
     </script>
 </body>
 </html>
+
+
+
+

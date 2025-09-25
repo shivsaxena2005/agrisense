@@ -3,9 +3,85 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Plant Diseases — Quick Chart & Solutions</title>
+  <title>AgriSense - Plant Disease Detection</title>
   <style>
-    html,body{height:100%;margin:0;padding:0;background:#ffffff;color:#111;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .navbar {
+        background: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2d6a4f;
+    }
+
+    .logo::before {
+        content: "🌱";
+        margin-right: 0.5rem;
+        font-size: 1.5rem;
+    }
+
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: #666;
+        font-weight: 500;
+        transition: color 0.3s;
+        padding: 0.5rem 0;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        color: #2d6a4f;
+    }
+
+    .user-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #495057;
+    }
+
     .container{max-width:1000px;margin:28px auto;padding:20px;border:3px solid #000;border-radius:12px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
     h1{font-size:1.8rem;margin:0 0 12px;text-align:center;border-bottom:2px solid #000;padding-bottom:8px}
     p.lead{margin:0 0 18px;color:#333;text-align:center}
@@ -17,26 +93,228 @@
     footer{margin-top:22px;color:#666;font-size:0.9rem;text-align:center}
     .images-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px;margin-top:25px}
     .images-row img{width:100%;border:2px solid #000;border-radius:8px;object-fit:cover;height:120px}
-    .nav-links a {
-            text-decoration: none;
-            color: #666;
-            font-weight: 500;
-            transition: color 0.3s;
-            padding: 0.5rem 0;
+    
+    .return-btn {
+        background: transparent;
+        border: 2px solid #2d6a4f;
+        color: #2d6a4f;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s;
+        display: block;
+        width: fit-content;
+        margin: 2rem auto 0;
+    }
+
+    .return-btn:hover {
+        background: #2d6a4f;
+        color: white;
+    }
+
+    .disease-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .upload-btn {
+        background: #2d6a4f;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.3s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .upload-btn:hover {
+        background: #1b4332;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .analysis-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin: 2rem 0;
+        border: 2px solid #e9ecef;
+    }
+
+    .analysis-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2d6a4f;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+    }
+
+    .disease-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .disease-card {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #2d6a4f;
+    }
+
+    .disease-card h3 {
+        color: #2d6a4f;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .disease-card p {
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .treatment-section {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .prevention-section {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .treatment-section h4,
+    .prevention-section h4 {
+        color: #856404;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .prevention-section h4 {
+        color: #0c5460;
+    }
+
+    .treatment-section ul,
+    .prevention-section ul {
+        margin: 0;
+        padding-left: 1.2rem;
+    }
+
+    .treatment-section li,
+    .prevention-section li {
+        margin-bottom: 0.3rem;
+        color: #333;
+    }
+
+    .uploaded-image {
+        max-width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .disease-header {
+            flex-direction: column;
+            align-items: stretch;
         }
 
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: #2d6a4f;
+        .disease-info {
+            grid-template-columns: 1fr;
         }
+    }
+    
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Common Plant Diseases — Quick Reference</h1>
-    <p class="lead">Table lists common plant diseases with a short one-line solution. The chart visualizes a simple severity index (1-10) for each disease to help prioritise action.</p>
+    <nav class="navbar">
+        <div class="logo">AgriSense</div>
+        <ul class="nav-links">
+            <li><a href="/?lang={{ language }}">Dashboard</a></li>
+            <li><a href="/disease?lang={{ language }}" class="active">Disease</a></li>
+            <li><a href="/iot?lang={{ language }}">IoT & Growth</a></li>
+            <li><a href="/market?lang={{ language }}">Market & Partnerships</a></li>
+            <li><a href="/chat?lang={{ language }}">{{ lang.nav_chat }}</a></li>
+            <select id="languageSelect" onchange="changeLanguage()" style="padding: 0.5rem; margin-left: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+                <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+            </select>
+        </ul>
+        <div class="user-section">
+            <div class="user-avatar">A</div>
+        </div>
+    </nav>
 
+  <div class="container">
+    <div class="disease-header">
+      <div>
+        <h1>{{ lang.disease_detection_title }}</h1>
+        <p class="lead">{{ "             Complete Guide to Plant and Crop Diseases: Diagnosis, Preventive Tips, Treatment Plans, and Crop-Specific Solutions   " }}</p>
+      </div>
+      <!-- <form action="/disease-upload" method="post" enctype="multipart/form-data" style="display: inline;">
+        <input type="file" name="file" id="fileInput" class="file-input" accept="image/*" onchange="this.form.submit()">
+        <label for="fileInput" class="upload-btn">
+          📤 {{ lang.upload_crop_image }}
+        </label>
+      </form> -->
+    </div>
+
+
+    {% if uploaded_image %}
+    <div class="analysis-section">
+      <h2 class="analysis-title">🔬 {{ lang.disease_analysis_results }}</h2>
+      
+      <img src="{{ url_for('static', filename='uploads/' + uploaded_image) }}" alt="Uploaded crop image" class="uploaded-image">
+      
+      <div class="disease-info">
+        <div class="disease-card">
+          <h3>🌿 {{ lang.plant_identified }}</h3>
+          <p><strong>{{ diagnosis_result.plant_name }}</strong><br>
+          <em>{{ diagnosis_result.plant_scientific_name }}</em></p>
+        </div>
+        
+        <div class="disease-card">
+          <h3>🦠 {{ lang.disease_detected }}</h3>
+          <p><strong>{{ diagnosis_result.disease }}</strong><br>
+          <em>{{ diagnosis_result.scientific_name }}</em><br>
+          Confidence: {{ diagnosis_result.confidence }}</p>
+        </div>
+      </div>
+
+      <div class="treatment-section">
+        <h4>💊 {{ lang.treatment_recommendations }}</h4>
+        <p>{{ diagnosis_result.treatment }}</p>
+      </div>
+
+      <div class="prevention-section">
+        <h4>🛡️ {{ lang.prevention_measures }}</h4>
+        <p>{{ diagnosis_result.prevention }}</p>
+      </div>
+    </div>
+    {% else %}
     <div class="images-row">
      <img src="{{ url_for('static', filename='sample_images/mango.jfif') }}" alt="Late blight">
 <img src="{{ url_for('static', filename='sample_images/potato.jfif') }}" alt="Powdery mildew">
@@ -44,14 +322,15 @@
 <img src="{{ url_for('static', filename='sample_images/download (2).jfif') }}" alt="Mosaic virus">
 
     </div>
+    {% endif %}
 
     <table aria-label="Plant diseases table">
       <thead>
         <tr>
-          <th>Disease</th>
-          <th>Host (example)</th>
-          <th>Symptoms</th>
-          <th>Quick solution (in a few words)</th>
+          <th>{{ lang.disease }}</th>
+          <th>{{ lang.host_example }}</th>
+          <th>{{ lang.symptoms }}</th>
+          <th>{{ lang.quick_solution }}</th>
         </tr>
       </thead>
       <tbody>
@@ -116,6 +395,19 @@
   </div>
 
   <script>
+    // Language switching functionality
+    function changeLanguage() {
+        const languageSelect = document.getElementById('languageSelect');
+        const selectedLanguage = languageSelect.value;
+        
+        // Get current URL and update language parameter
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('lang', selectedLanguage);
+        
+        // Redirect to the same page with new language
+        window.location.href = currentUrl.toString();
+    }
+    
     const labels = ['Late blight','Powdery mildew','Downy mildew','Anthracnose','Bacterial spot','Root rot','Rust','Mosaic virus'];
     const severity = [9,5,6,5,6,7,4,6];
     const ctx = document.getElementById('diseaseChart').getContext('2d');
@@ -143,9 +435,8 @@
       }
     });
   </script>
-  </div>
 
-  <a href="/" class="return-btn">Go Back to Dashboard</a>
-</div>
+  <a href="/?lang={{ language }}" class="return-btn">{{ lang.go_back_dashboard }}</a>
+  </div>
 </body>
 </html>

@@ -261,63 +261,66 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">AgriSense</div>
-        <ul class="nav-links">
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/disease">Disease</a></li>
-            <li><a href="/iot" class="active">IoT & Growth</a></li>
-            <li><a href="/market">Market Partnerships</a></li>
-        </ul>
-        <div class="user-section">
-            <span class="mic-icon">🎤</span>
-            <div class="user-avatar">A</div>
-        </div>
-    </nav>
+   <nav class="navbar">
+    <div class="logo">AgriSense</div>
+    <ul class="nav-links">
+        <li><a href="/?lang={{ language }}" class="active">{{ lang.nav_dashboard }}</a></li>
+        <li><a href="/disease?lang={{ language }}">{{ lang.nav_disease }}</a></li>
+        <li><a href="/iot?lang={{ language }}">{{ lang.nav_iot }}</a></li>
+        <li><a href="/market?lang={{ language }}">{{ lang.nav_market }}</a></li>
+        <li><a href="/chat?lang={{ language }}">{{ lang.nav_chat }}</a></li>
+        <select id="languageSelect" onchange="changeLanguage()" style="padding: 0.5rem; margin-left: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+            <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+            <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+        </select>
+    </ul>
+    <div class="user-avatar">A</div>
+</nav>
+
 
     <div class="container">
-        <h1 class="page-title">Detailed IoT Monitoring & Growth Analysis</h1>
+        <h1 class="page-title">{{ lang.iot_monitoring }}</h1>
         
         <div class="main-grid">
             <div class="left-section">
                 <div class="card">
-                    <h2 class="section-title">Current Field Readings 🛰️</h2>
+                    <h2 class="section-title">{{ lang.current_field_readings }} 🛰️</h2>
                     <div class="iot-data-grid">
                         <div class="iot-data-item">
                             <div class="iot-icon">💧</div>
-                            <div class="iot-label">Soil Moisture</div>
+                            <div class="iot-label">{{ lang.soil_moisture }}</div>
                             <div class="iot-value">{{ iot_data.soil_health.moisture }}%</div>
                         </div>
                         <div class="iot-data-item">
                             <div class="iot-icon">🔬</div>
-                            <div class="iot-label">Soil pH</div>
+                            <div class="iot-label">{{ lang.soil_ph }}</div>
                             <div class="iot-value">{{ iot_data.soil_health.ph }}</div>
                         </div>
                         <div class="iot-data-item">
                             <div class="iot-icon">🧪</div>
-                            <div class="iot-label">Nutrient Level</div>
+                            <div class="iot-label">{{ lang.nutrient_level }}</div>
                             <div class="iot-value">{{ iot_data.soil_health.nutrients }}</div>
                         </div>
                         <div class="iot-data-item">
                             <div class="iot-icon">📈</div>
-                            <div class="iot-label">Plant Growth</div>
+                            <div class="iot-label">{{ lang.plant_growth }}</div>
                             <div class="iot-value">{{ iot_data.plant_health.growth }}</div>
                         </div>
                         <div class="iot-data-item">
                             <div class="iot-icon">🌡️</div>
-                            <div class="iot-label">Stress Level</div>
+                            <div class="iot-label">{{ lang.stress_level }}</div>
                             <div class="iot-value">{{ iot_data.plant_health.stress }}</div>
                         </div>
                         <div class="iot-data-item">
                             <div class="iot-icon">🌬️</div>
-                            <div class="iot-label">Weather Alert</div>
+                            <div class="iot-label">{{ lang.weather_alert }}</div>
                             <div class="iot-value">{{ iot_data.weather_alert.type }}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h2 class="section-title">Growth Timeline & Predictions 📊</h2>
+                    <h2 class="section-title">{{ lang.growth_timeline_predictions }} 📊</h2>
                     <div class="weather-alert">
                         <h4 class="weather-alert-title">⚠️{{ iot_data.weather_alert.type }}</h4>
                         <p class="weather-alert-text">{{ iot_data.weather_alert.warning }}</p>
@@ -354,9 +357,24 @@
                     </ul>
                 </div>
 
-                <a href="/" class="return-btn">Go Back to Dashboard</a>
+                <a href="/?lang={{ language }}" class="return-btn">{{ lang.go_back_dashboard }}</a>
             </div>
         </div>
     </div>
+
+    <script>
+        // Language switching functionality
+        function changeLanguage() {
+            const languageSelect = document.getElementById('languageSelect');
+            const selectedLanguage = languageSelect.value;
+            
+            // Get current URL and update language parameter
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('lang', selectedLanguage);
+            
+            // Redirect to the same page with new language
+            window.location.href = currentUrl.toString();
+        }
+    </script>
 </body>
 </html>

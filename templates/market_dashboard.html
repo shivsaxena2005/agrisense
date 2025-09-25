@@ -217,10 +217,15 @@
     <nav class="navbar">
         <div class="logo">AgriSense</div>
         <ul class="nav-links">
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/disease">Disease</a></li>
-            <li><a href="/iot">IoT & Growth</a></li>
-            <li><a href="/market" class="active">Market & Partnerships</a></li>
+            <li><a href="/?lang={{ language }}">Dashboard</a></li>
+            <li><a href="/disease?lang={{ language }}">Disease</a></li>
+            <li><a href="/iot?lang={{ language }}">IoT & Growth</a></li>
+            <li><a href="/market?lang={{ language }}" class="active">Market & Partnerships</a></li>
+            <li><a href="/chat?lang={{ language }}">{{ lang.nav_chat }}</a></li>
+            <select id="languageSelect" onchange="changeLanguage()" style="padding: 0.5rem; margin-left: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+                <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+            </select>
         </ul>
         <div class="user-section">
             <div class="user-avatar">A</div>
@@ -228,37 +233,37 @@
     </nav>
 
     <div class="container">
-        <h1 class="page-title">Market Dashboard</h1>
+        <h1 class="page-title">{{ lang.market_dashboard }}</h1>
 
         <div class="market-summary">
             <div class="summary-card">
-                <div class="summary-card-title">Wheat Price Trend</div>
+                <div class="summary-card-title">{{ lang.wheat_price_trend }}</div>
                 <div class="summary-value">₹{{ market_data[0].price }}</div>
                 <span class="trend-badge {{ wheat_trend.direction }}">
                     {{ wheat_trend.change }} {{ '▲' if wheat_trend.direction == 'up' else '▼' }} (30 days)
                 </span>
             </div>
             <div class="summary-card">
-                <div class="summary-card-title">Total Daily Arrivals</div>
+                <div class="summary-card-title">{{ lang.total_daily_arrivals }}</div>
                 <div class="summary-value">{{ market_data | map(attribute='arrivals') | sum }} bags</div>
 
             </div>
             <div class="summary-card">
-                <div class="summary-card-title">Top Performer</div>
+                <div class="summary-card-title">{{ lang.top_performer }}</div>
                 <div class="summary-value">{{ market_data[0].name }}</div>
             </div>
         </div>
 
         <div class="market-table-container">
-            <h2 class="section-title">Commodity Prices & Arrivals</h2>
+            <h2 class="section-title">{{ lang.commodity_prices }}</h2>
             <table class="market-table">
                 <thead>
                     <tr>
-                        <th>Commodity</th>
-                        <th>Market</th>
-                        <th>Price (per quintal)</th>
-                        <th>Arrivals (bags)</th>
-                        <th>Last Updated</th>
+                        <th>{{ lang.commodity }}</th>
+                        <th>{{ lang.market }}</th>
+                        <th>{{ lang.price_per_quintal }}</th>
+                        <th>{{ lang.arrivals_bags }}</th>
+                        <th>{{ lang.last_updated }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -275,7 +280,22 @@
             </table>
         </div>
 
-        <a href="/" class="return-btn">Go Back to Dashboard</a>
+        <a href="/?lang={{ language }}" class="return-btn">{{ lang.go_back_dashboard }}</a>
     </div>
+
+    <script>
+        // Language switching functionality
+        function changeLanguage() {
+            const languageSelect = document.getElementById('languageSelect');
+            const selectedLanguage = languageSelect.value;
+            
+            // Get current URL and update language parameter
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('lang', selectedLanguage);
+            
+            // Redirect to the same page with new language
+            window.location.href = currentUrl.toString();
+        }
+    </script>
 </body>
 </html>
